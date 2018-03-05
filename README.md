@@ -138,8 +138,9 @@ maximum number of recent builds per job.
 | `url`        | The url to the Jenkins server
 | `username`   | Your Jenkins user name
 | `password`   | Your Jenkins password
-| `job`        | The name of the Jenkins job whose builds are to be shown in single-job mode. Takes precedence over `view` if both are given.
-| `view`       | The name of the Jenkins view whose jobs and builds are to be shown in single-view mode. Optional.
+| `job`        | The name of the Jenkins job whose builds are to be shown in single-job mode.
+| `jobs`       | The name of the Jenkins job with multiple sub jobs to be shown in single-job mode. Takes precedence over `job` if both are given.
+| `view`       | The name of the Jenkins view whose jobs and builds are to be shown in single-view mode. Takes precedence over `job(s)` if both are given.
 | `options`    | The request options.
 |              | Refer to [request module](https://github.com/request/request#requestdefaultsoptions) options for possible values
 | `numberOfBuildsPerJob` | Limit the number of builds fetched for each job. Optional, defaults to no limitation.
@@ -196,7 +197,7 @@ Supports the [Visual Studio Team Services](http://www.visualstudio.com/) and [Te
 | `pat`           | Personal Access Token with access to builds
 | `queryparams`   | Any query params that REST API accepts, more info: https://www.visualstudio.com/en-us/docs/integrate/api/build/builds
 
-_Note_: 
+_Note_:
 - [Create a peronal access token](https://docs.microsoft.com/en-us/vsts/accounts/use-personal-access-tokens-to-authenticate) with access to read builds.
 - The url formed is of the following format: https://{instance}/DefaultCollection/{project}/_apis/build/builds?api-version=2.0[queryparams]
 - Please note that all the configuration fields are mandatory. If a field is not required like queryparams, please provide empty string in the configuration.
@@ -406,7 +407,7 @@ Supports [Buildkite](https://buildkite.com) build service
 |------------------ |------------------------------------
 | `orgSlug`         | Organization slug, visible in the url when on the pipelines page (e.g `https://buildkite.com/<your-organisation-slug>`)
 | `teamSlug`        | An team slug to filter the pipelines on, set to `everyone` for all pipelines
-| `BUILDKITE_TOKEN` | An **ENVIRONMENT VARIABLE** with your access token. See: https://buildkite.com/docs/graphql-api for instructions on generating your token. 
+| `BUILDKITE_TOKEN` | An **ENVIRONMENT VARIABLE** with your access token. See: https://buildkite.com/docs/graphql-api for instructions on generating your token.
 
 ### Run the standalone version (easiest way)
 

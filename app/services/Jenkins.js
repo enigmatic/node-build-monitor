@@ -77,8 +77,30 @@ module.exports = function () {
                 callback(error, simplifyBuild(data));
             });
         },
+        requestBuildByURL = function (build, callback) {
+          makeRequest(requestWithDefaults, build.url + '/api/json', function(error, data) {
+              if (error) {
+                  callback(error);
+                  return;
+              }
+
+              data.jobId = build.jobId;
+
+              callback(error, simplifyBuild(data));
+          });
+      },
         requestJobsForView = function (viewId, callback) {
             makeRequest(requestWithDefaults, self.configuration.url + '/view/' + viewId + '/api/json', function(error, data) {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                callback(error, data.jobs);
+            });
+        },
+        requestJobsForJob = function (jobId, callback) {
+            makeRequest(requestWithDefaults, self.configuration.url + '/job/' + jobId + '/api/json', function(error, data) {
                 if (error) {
                     callback(error);
                     return;
@@ -99,6 +121,18 @@ module.exports = function () {
                 });
             });
         },
+        queryBuildsForJobUrl = function (jobId, jobUrl, callback) {
+          requestBuildsForJobByUrl(jobId, jobUrl, function (error, body) {
+                if (error) {
+                    callback(error);
+                    return;
+                }
+
+                async.map(body, requestBuildByURL, function (error, results) {
+                    callback(error, results);
+                });
+            });
+        },
         queryBuildsForView = function (viewId, callback) {
             requestJobsForView(viewId, function (error, body) {
                 if (error) {
@@ -113,6 +147,20 @@ module.exports = function () {
                 });
             });
         },
+        queryBuildsForJobs = function (viewId, callback) {
+          requestJobsForJob(viewId, function (error, body) {
+              if (error) {
+                callback(error);
+                return;
+              }
+
+              async.map(body, function (job, callback) {
+                  queryBuildsForJobUrl(job.name, job.url, callback);
+              }, function (error, results) {
+                  callback(error, flatten(results));
+              });
+          });
+      },
         parseDate = function (dateAsString) {
             return new Date(dateAsString);
         },
@@ -193,7 +241,9 @@ module.exports = function () {
     self.check = function (callback) {
         if (self.configuration.view) {
             queryBuildsForView(self.configuration.view, callback);
-        } else {
+        } else if (self.configuration.jobs) {
+          queryBuildsForJobs(self.configuration.jobs, callback);
+      } else {
             queryBuildsForJob(self.configuration.job, callback);
         }
     };
